@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Don't Take the Bait — Phishing Awareness Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5F8; --card:#FFFFFF; --ink:#14213D; --muted:#56607A;
+  --red:#C4342D; --blue:#1F4E9E; --mark:#FFD54A; --ok:#1E7A4C; --line:#D5DAE3;
+  --head:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10182B; --card:#18223A; --ink:#E8ECF4; --muted:#A3AEC6;
+    --red:#EF6A60; --blue:#7FA6F0; --mark:#8A6D00; --ok:#5CC592; --line:#2C3957;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10182B; --card:#18223A; --ink:#E8ECF4; --muted:#A3AEC6;
+  --red:#EF6A60; --blue:#7FA6F0; --mark:#8A6D00; --ok:#5CC592; --line:#2C3957;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1.125rem;line-height:1.65}
+h1,h2,h3{font-family:var(--head);line-height:1.15;margin:0 0 .6em}
+h1{font-size:clamp(2.4rem,7vw,4.6rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0 0 1em}
+a{color:var(--blue)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+/* airmail stripe: the one signature element */
+.airmail{--s:14px;background:repeating-linear-gradient(135deg,var(--red) 0 var(--s),var(--card) var(--s) calc(var(--s)*2),var(--blue) calc(var(--s)*2) calc(var(--s)*3),var(--card) calc(var(--s)*3) calc(var(--s)*4));padding:8px}
+.airmail>.inner{background:var(--card)}
+
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+.wide{max-width:980px;margin:0 auto;padding:0 20px}
+
+/* hero */
+header.hero{padding:56px 0 40px}
+.hero p.lead{font-size:1.3rem;color:var(--muted);max-width:36ch}
+.hero .stamp{display:inline-block;border:3px solid var(--red);color:var(--red);font-family:var(--head);font-weight:800;padding:4px 12px;transform:rotate(-4deg);margin-bottom:24px;font-size:.95rem}
+.progress{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);border-bottom:1px solid var(--line)}
+.progress nav{display:flex;gap:4px;overflow-x:auto;padding:10px 20px;max-width:980px;margin:0 auto}
+.progress a{font-family:var(--head);font-size:.85rem;font-weight:600;text-decoration:none;color:var(--muted);padding:6px 10px;border-radius:6px;white-space:nowrap}
+.progress a:hover,.progress a.active{background:var(--card);color:var(--ink)}
+
+section{padding:64px 0;border-bottom:1px solid var(--line)}
+.step{font-family:var(--head);font-weight:700;color:var(--red);font-size:1rem;margin-bottom:.4em}
+
+/* types grid */
+.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:2px;background:var(--line);border:2px solid var(--line);margin-top:24px}
+.types div{background:var(--card);padding:18px}
+.types b{font-family:var(--head);display:block;margin-bottom:4px}
+.types span{font-size:1rem;color:var(--muted)}
+
+/* mock email */
+.email{font-family:var(--head);font-size:1rem}
+.email .inner{padding:0}
+.email .hdr{padding:18px 22px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.email .hdr dt{color:var(--muted);font-weight:500}
+.email .hdr dd{margin:0;overflow-wrap:anywhere}
+.email .bodytext{padding:22px;font-family:Arial,Helvetica,sans-serif;line-height:1.6}
+.email .btnfake{display:inline-block;background:#0070BA;color:#fff;padding:10px 22px;border-radius:4px;font-weight:bold;margin:8px 0}
+.flag{background:none;border:0;padding:0 2px;color:inherit;text-align:inherit;border-bottom:2px solid transparent;border-radius:0}
+.flag:hover{background:color-mix(in srgb,var(--mark) 45%,transparent)}
+.flag.found{background:var(--mark);border-bottom-color:transparent;color:#14213D}
+.flagbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0 10px;font-family:var(--head)}
+.meter{flex:1;min-width:160px;height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--red);transition:width .3s}
+.explain{min-height:4.5em;padding:14px 18px;background:var(--card);border-left:5px solid var(--red);font-size:1rem}
+.linkbtn{background:none;border:0;color:var(--blue);text-decoration:underline;padding:0;font-family:var(--head);font-size:.95rem}
+
+/* URL challenge */
+.urls{list-style:none;padding:0;margin:24px 0 0}
+.urls li{background:var(--card);border:1px solid var(--line);padding:16px 18px;margin-bottom:10px}
+.urls code{font-family:"Courier New",Courier,monospace;font-size:1.02rem;overflow-wrap:anywhere;display:block;margin-bottom:10px}
+.choice{display:flex;gap:8px}
+.choice button{border:2px solid var(--ink);background:transparent;color:var(--ink);padding:4px 16px;border-radius:4px;font-family:var(--head);font-weight:600;font-size:.95rem}
+.choice button:disabled{opacity:.45;cursor:default}
+.verdict{font-size:1rem;margin-top:10px}
+.verdict.right{color:var(--ok)} .verdict.wrong{color:var(--red)}
+
+/* tactics */
+.tactic{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:18px 0;border-top:1px solid var(--line)}
+.tactic:first-of-type{border-top:0}
+.tactic h3{margin:0;color:var(--blue)}
+.tactic q{display:block;font-style:italic;color:var(--muted);margin-top:6px;quotes:"“" "”"}
+@media (max-width:560px){.tactic{grid-template-columns:1fr;gap:4px}}
+
+/* cases */
+.case{padding:22px 0;border-top:1px solid var(--line)}
+.case .yr{font-family:var(--head);font-weight:800;font-size:2rem;color:var(--red);line-height:1}
+.case p{margin:.4em 0 0}
+.lesson{font-size:1rem;color:var(--muted)}
+
+/* practices */
+.practices{counter-reset:none;padding-left:1.2em}
+.practices li{margin-bottom:.6em}
+.panic{margin-top:32px}
+.panic .inner{padding:22px 26px}
+.panic ol{margin:0;padding-left:1.3em}
+
+/* quiz */
+.quiz .q{display:none}
+.quiz .q.show{display:block}
+.qnum{font-family:var(--head);color:var(--muted);font-size:.95rem}
+.opts{display:grid;gap:10px;margin:18px 0}
+.opts button{text-align:left;background:var(--card);border:2px solid var(--line);color:var(--ink);padding:14px 16px;border-radius:6px;font-size:1.02rem}
+.opts button:hover:not(:disabled){border-color:var(--blue)}
+.opts button.correct{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,var(--card))}
+.opts button.incorrect{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--card))}
+.feedback{font-size:1rem;margin-bottom:14px}
+.primary{background:var(--ink);color:var(--paper);border:0;padding:12px 24px;border-radius:6px;font-family:var(--head);font-weight:700}
+.result{text-align:center;padding:30px 10px}
+.result .score{font-family:var(--head);font-weight:800;font-size:5rem;line-height:1;color:var(--blue)}
+footer{padding:40px 0 60px;color:var(--muted);font-size:.95rem}
+</style>
+</head>
+<body>
+
+<header class="hero wrap">
+  <div class="stamp">Training module</div>
+  <h1>Don't take the bait.</h1>
+  <p class="lead">Learn to spot phishing emails, fake websites and the psychological tricks behind them in about 20 minutes.</p>
+</header>
+
+<div class="progress"><nav aria-label="Sections">
+  <a href="#what">1. What is phishing</a>
+  <a href="#anatomy">2. Spot the email</a>
+  <a href="#sites">3. Fake websites</a>
+  <a href="#tactics">4. Social engineering</a>
+  <a href="#cases">5. Real attacks</a>
+  <a href="#practices">6. Best practices</a>
+  <a href="#quiz">7. Final quiz</a>
+</nav></div>
+
+<main>
+<!-- 1 -->
+<section id="what"><div class="wrap">
+  <div class="step">Step 1</div>
+  <h2>What is phishing?</h2>
+  <p>Phishing is a cyberattack where criminals pretend to be someone you trust, like your bank, your boss, a delivery company or IT support. They want you to hand over passwords, money or access, or to open a file that installs malware.</p>
+  <p>It works because it targets people, not technology. The best firewall in the world can't stop you from typing your password into a fake page. According to Verizon's Data Breach Investigations Reports, the human element (mistakes, stolen credentials and social engineering) is involved in the majority of breaches year after year.</p>
+  <div class="types">
+    <div><b>Email phishing</b><span>Mass emails sent to thousands, hoping a few people click.</span></div>
+    <div><b>Spear phishing</b><span>Tailored to one person, using their name, role or recent activity.</span></div>
+    <div><b>Whaling</b><span>Spear phishing aimed at executives and senior staff.</span></div>
+    <div><b>Smishing</b><span>Phishing by SMS or WhatsApp, such as fake parcel or bank alerts.</span></div>
+    <div><b>Vishing</b><span>Voice calls from fake banks, police or tech support.</span></div>
+    <div><b>Business email compromise</b><span>Fake "CEO" or supplier emails requesting urgent payments.</span></div>
+    <div><b>Clone phishing</b><span>A copy of a real email you received, with the link swapped.</span></div>
+    <div><b>Quishing</b><span>Malicious QR codes on posters, parking meters or emails.</span></div>
+  </div>
+</div></section>
+
+<!-- 2 -->
+<section id="anatomy"><div class="wide">
+  <div class="wrap" style="padding:0">
+    <div class="step">Step 2 · Interactive</div>
+    <h2>Find the red flags</h2>
+    <p>This email is a phishing attempt. Click every suspicious detail you can find. There are seven.</p>
+  </div>
+  <div class="airmail email" style="margin-top:20px"><div class="inner">
+    <dl class="hdr">
+      <dt>From</dt><dd>PayPal Service <button class="flag" data-i="0">&lt;service@paypa1-secure-login.com&gt;</button></dd>
+      <dt>To</dt><dd><button class="flag" data-i="1">undisclosed-recipients</button></dd>
+      <dt>Subject</dt><dd><button class="flag" data-i="2">⚠ URGENT: Your account will be suspended in 24 hours!!</button></dd>
+    </dl>
+    <div class="bodytext">
+      <p><button class="flag" data-i="3">Dear Valued Customer,</button></p>
+      <p>We have detected unusual activity on your account. For your protection, <button class="flag" data-i="4">your account will be permanantly suspended unless you verify you're information today.</button></p>
+      <p><button class="flag" data-i="5"><span class="btnfake">Verify My Account</span></button></p>
+      <p style="font-size:.9em;color:#555">Link destination on hover: http://paypal.account-verify.ru/login.php</p>
+      <p>Please also complete the <button class="flag" data-i="6">attached form (Account_Verification.pdf.exe)</button> and have your card number ready.</p>
+      <p>Thank you,<br>PayPal Security Team</p>
+    </div>
+  </div></div>
+  <div class="wrap" style="padding:0">
+    <div class="flagbar"><span id="flagCount">0 of 7 found</span><div class="meter" aria-hidden="true"><i id="flagMeter"></i></div><button class="linkbtn" id="revealAll">Show all</button></div>
+    <div class="explain" id="flagExplain" aria-live="polite">Click a suspicious part of the email to see why it's a warning sign.</div>
+  </div>
+</div></section>
+
+<!-- 3 -->
+<section id="sites"><div class="wrap">
+  <div class="step">Step 3 · Interactive</div>
+  <h2>Spot the fake website</h2>
+  <p>Fake sites copy the look of real ones perfectly, so the address bar is where you catch them. Read a URL by finding the <strong>real domain</strong>: the part just before the first single slash <code>/</code> after <code>https://</code>. Read that part right to left.</p>
+  <p>Remember that the padlock icon only means the connection is encrypted. It says nothing about who owns the site. Most phishing sites use HTTPS today.</p>
+  <p>Is each address real or fake?</p>
+  <ul class="urls" id="urlList"></ul>
+  <h3 style="margin-top:32px">Other signs of a fake site</h3>
+  <ul>
+    <li>The page asks for more than the real site ever would, such as your card PIN, full card number or one-time codes.</li>
+    <li>Low-quality logos, spelling errors, or links in the footer that don't work.</li>
+    <li>You arrived from a link in an email or text instead of typing the address yourself.</li>
+    <li>Your password manager doesn't autofill. It matches exact domains, so it won't be fooled by a lookalike.</li>
+  </ul>
+</div></section>
+
+<!-- 4 -->
+<section id="tactics"><div class="wrap">
+  <div class="step">Step 4</div>
+  <h2>Social engineering: how they hack your mind</h2>
+  <p>Attackers exploit normal human instincts. If a message makes you feel a strong emotion and pushes you to act fast, slow down.</p>
+  <div class="tactic"><h3>Urgency</h3><div>A deadline leaves you no time to think.<q>Your account will be closed in 2 hours.</q></div></div>
+  <div class="tactic"><h3>Authority</h3><div>They pose as a boss, police, government or IT department, and people rarely question authority.<q>This is the CEO. I need this wire transfer done before my meeting.</q></div></div>
+  <div class="tactic"><h3>Fear</h3><div>They threaten fines, arrest, hacked accounts or lost data.<q>We found illegal files on your computer. Pay the fine now.</q></div></div>
+  <div class="tactic"><h3>Greed and reward</h3><div>They offer prizes, refunds or easy money.<q>Congratulations! You've won an iPhone. Pay only the shipping.</q></div></div>
+  <div class="tactic"><h3>Curiosity</h3><div>They tempt you with a document or link you want to see.<q>Salary_Revisions_2026.xlsx — confidential.</q></div></div>
+  <div class="tactic"><h3>Trust and helpfulness</h3><div>They pose as a colleague or friend who needs a small favour.<q>Hey, I'm locked out. Can you read me the code you just got?</q></div></div>
+  <div class="tactic"><h3>Pretexting</h3><div>They build a believable backstory first, often over several messages or calls.<q>Hi, I'm from the IT help desk, following up on the ticket about your slow laptop…</q></div></div>
+  <div class="tactic"><h3>Baiting and tailgating</h3><div>These are physical tricks. An infected USB stick is left in the car park labelled "Payroll", or someone follows staff through a secure door carrying boxes.</div></div>
+</div></section>
+
+<!-- 5 -->
+<section id="cases"><div class="wrap">
+  <div class="step">Step 5</div>
+  <h2>Real attacks that started with one message</h2>
+  <div class="case"><div class="yr">2013–15</div><h3>Google and Facebook lose over $100 million</h3>
+    <p>A Lithuanian man set up a fake company named after Quanta Computer, a real hardware supplier. He emailed fake invoices to the finance teams of both tech giants, and they paid for about two years. He was caught and sentenced to five years in US prison.</p>
+    <p class="lesson">Lesson: always confirm payment or bank-detail changes through a separate, known channel, even for big "trusted" suppliers.</p></div>
+  <div class="case"><div class="yr">2016</div><h3>A political campaign's emails leak</h3>
+    <p>John Podesta, chairman of Hillary Clinton's presidential campaign, received a fake "someone has your password" Google alert. The link led to a lookalike login page, and thousands of his emails were later published.</p>
+    <p class="lesson">Lesson: security alerts are a favourite disguise. Go to the site yourself instead of clicking the link.</p></div>
+  <div class="case"><div class="yr">2020</div><h3>Twitter's celebrity accounts hijacked</h3>
+    <p>Attackers phoned Twitter employees pretending to be internal IT and steered them to a fake VPN login page. With the stolen access, they posted Bitcoin scams from the accounts of Barack Obama, Elon Musk, Apple and others.</p>
+    <p class="lesson">Lesson: vishing works. Verify callers by calling them back on an official number.</p></div>
+  <div class="case"><div class="yr">2023</div><h3>MGM Resorts shut down by a phone call</h3>
+    <p>Attackers found an employee on LinkedIn and called MGM's IT help desk pretending to be that person. They talked their way into a login reset. The ransomware attack that followed disrupted hotels and casinos for days and cost the company around $100 million.</p>
+    <p class="lesson">Lesson: help desks need strict identity checks, and the information you share publicly can be used against your employer.</p></div>
+</div></section>
+
+<!-- 6 -->
+<section id="practices"><div class="wrap">
+  <div class="step">Step 6</div>
+  <h2>How to protect yourself</h2>
+  <ul class="practices">
+    <li><strong>Stop, think, verify.</strong> If a message is urgent, emotional or unexpected, pause before acting.</li>
+    <li><strong>Hover before you click.</strong> Check where a link really goes. On a phone, press and hold the link.</li>
+    <li><strong>Go direct.</strong> Type the website address yourself or use the official app, never the link in the message.</li>
+    <li><strong>Verify through another channel.</strong> Call the person or company on a number you already know, not one given in the message.</li>
+    <li><strong>Turn on multi-factor authentication (MFA)</strong> everywhere. Passkeys and security keys resist phishing best.</li>
+    <li><strong>Never share one-time codes.</strong> No real bank, company or IT team will ever ask for them.</li>
+    <li><strong>Use a password manager.</strong> It won't autofill on fake domains, and it lets you use a unique password for every site.</li>
+    <li><strong>Be careful with attachments</strong>, especially .exe, .zip, .html, .iso, and Office files that ask you to "enable macros".</li>
+    <li><strong>Keep software updated</strong> so a click can't exploit old vulnerabilities.</li>
+    <li><strong>Limit what you share publicly.</strong> Your job title, manager's name and holiday plans all make spear phishing easier.</li>
+    <li><strong>Report it.</strong> Use your organisation's "Report phishing" button. In the UK you can forward emails to report@phishing.gov.uk and texts to 7726.</li>
+  </ul>
+  <div class="airmail panic"><div class="inner">
+    <h3>Already clicked? Act fast. It isn't a disaster if you act quickly.</h3>
+    <ol>
+      <li>Disconnect from the network if you opened an attachment or installed something.</li>
+      <li>Change the password you entered, from a different device, along with any account that reuses it.</li>
+      <li>Contact your bank immediately if you shared card or payment details.</li>
+      <li>Tell your IT or security team right away. Early reports limit the damage.</li>
+      <li>Watch your accounts for unusual activity over the following weeks.</li>
+    </ol>
+  </div></div>
+</div></section>
+
+<!-- 7 -->
+<section id="quiz"><div class="wrap quiz">
+  <div class="step">Step 7</div>
+  <h2>Final quiz</h2>
+  <p>Ten questions. You need 8 or more to pass.</p>
+  <div id="quizBox"></div>
+</div></section>
+</main>
+
+<footer class="wrap">Phishing Awareness Training · Built for the CodeAlpha Cyber Security Internship</footer>
+
+<script>
+/* ---------- Red flags ---------- */
+const flags = [
+  "The sender's domain is fake. It uses the number 1 instead of the letter l (paypa1) plus extra words. PayPal only sends from @paypal.com.",
+  "The email wasn't sent to you by name. It went to a hidden mass mailing list.",
+  "Urgency and threats in the subject line, plus warning symbols and exclamation marks, are designed to make you panic and act without thinking.",
+  "A generic greeting. Real companies usually address you by your actual name.",
+  "Spelling and grammar mistakes (\"permanantly\", \"you're information\"). These are common in phishing and help filter out careful readers.",
+  "The button's real destination is a different domain (account-verify.ru). Always hover over links to see where they really go.",
+  "A double file extension (.pdf.exe) is a program disguised as a document. Legitimate companies also never ask you to email card details."
+];
+const found = new Set();
+const flagEls = document.querySelectorAll('.flag');
+const explain = document.getElementById('flagExplain');
+function updateFlags(){
+  document.getElementById('flagCount').textContent = `${found.size} of 7 found`;
+  document.getElementById('flagMeter').style.width = (found.size/7*100)+'%';
+  if(found.size===7) explain.innerHTML += '<br><strong>Great job — you found all seven red flags.</strong>';
+}
+flagEls.forEach(el=>el.addEventListener('click',()=>{
+  const i=+el.dataset.i; el.classList.add('found'); found.add(i);
+  explain.textContent = `Red flag: ${flags[i]}`; updateFlags();
+}));
+document.getElementById('revealAll').addEventListener('click',()=>{
+  flagEls.forEach(el=>{el.classList.add('found');found.add(+el.dataset.i)});
+  explain.innerHTML = flags.map((f,i)=>`<div>${i+1}. ${f}</div>`).join(''); updateFlags();
+});
+
+/* ---------- URL challenge ---------- */
+const urls = [
+  {u:"https://www.amazon.co.uk/your-orders", real:true, why:"The real domain is amazon.co.uk and the rest is just a page path."},
+  {u:"https://amazon.co.uk.order-refund.com/login", real:false, why:"Read right to left: the real domain is order-refund.com. \"amazon.co.uk\" is only a subdomain the attacker added."},
+  {u:"https://www.paypal.com.security-check.net", real:false, why:"The domain is security-check.net. The trick is putting a trusted name at the start."},
+  {u:"https://accounts.google.com/signin", real:true, why:"accounts is a subdomain of google.com, which is Google's real domain."},
+  {u:"https://www.micros0ft-support.com", real:false, why:"A zero replaces the letter o, and the word \"-support\" is added. This is typosquatting."},
+  {u:"https://www.hsbc.co.uk/online-banking/", real:true, why:"hsbc.co.uk is HSBC UK's genuine domain."},
+  {u:"http://192.168.44.12/netflix/update-payment", real:false, why:"A raw IP address instead of a domain, with no HTTPS. Real companies never do this."}
+];
+const urlList = document.getElementById('urlList');
+urls.forEach((x,i)=>{
+  const li=document.createElement('li');
+  li.innerHTML=`<code>${x.u}</code><div class="choice"><button data-a="1">Real</button><button data-a="0">Fake</button></div><div class="verdict" aria-live="polite"></div>`;
+  li.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const guess=b.dataset.a==="1", ok=guess===x.real, v=li.querySelector('.verdict');
+    v.className='verdict '+(ok?'right':'wrong');
+    v.textContent=(ok?'Correct. ':'Not quite. ')+`It's ${x.real?'real':'fake'}. ${x.why}`;
+    li.querySelectorAll('button').forEach(bb=>bb.disabled=true);
+  }));
+  urlList.appendChild(li);
+});
+
+/* ---------- Quiz ---------- */
+const quiz = [
+  {q:"You get a text: \"Your parcel couldn't be delivered. Pay a £1.99 redelivery fee here.\" What's the safest action?",
+   o:["Pay it, since it's only £1.99","Reply STOP","Check your orders on the courier's official site or app instead of using the link","Click the link to see if it looks real"],a:2,
+   e:"Small fees are a classic way to steal full card details. Check through the official site or app."},
+  {q:"What does the padlock (HTTPS) in the address bar guarantee?",
+   o:["The site is safe and legitimate","The connection is encrypted, but not who owns the site","The site has been approved by Google","The site cannot contain malware"],a:1,
+   e:"Anyone can get a free HTTPS certificate, and most phishing sites use one."},
+  {q:"Which domain actually belongs to Microsoft?",
+   o:["microsoft.com.account-check.io","login.microsoftonline.com","micr0soft.com","microsoft-support-team.net"],a:1,
+   e:"microsoftonline.com is Microsoft's real login domain. The others are lookalikes or subdomain tricks."},
+  {q:"Your \"CEO\" emails asking you to buy gift cards urgently and keep it secret. This is:",
+   o:["A normal request","Business email compromise / CEO fraud","Spam that's harmless to ignore","A software bug"],a:1,
+   e:"Urgency, authority and secrecy together are strong signs of CEO fraud. Verify by phone."},
+  {q:"Someone calling from \"your bank\" asks for the one-time code just sent to your phone. You should:",
+   o:["Read it to them because they verified your name","Hang up and call the number on the back of your card","Give only half the code","Send it by text instead"],a:1,
+   e:"No genuine bank asks for your one-time codes. Hang up and call a number you trust."},
+  {q:"Which attachment is most suspicious?",
+   o:["Invoice.pdf","Meeting_Notes.docx","Payment_Details.pdf.exe","Photo.jpg"],a:2,
+   e:"A double extension hides an executable program behind a document-looking name."},
+  {q:"Targeted phishing that uses your name, job and colleagues' names is called:",
+   o:["Spear phishing","Smishing","Baiting","Spam"],a:0,
+   e:"Spear phishing is personalised and much more convincing than mass phishing."},
+  {q:"Which protection most effectively stops stolen passwords from being used?",
+   o:["Longer email signatures","Multi-factor authentication, ideally passkeys or security keys","Clearing your browser history","Using incognito mode"],a:1,
+   e:"MFA adds a second barrier, and phishing-resistant MFA like passkeys can't be phished at all."},
+  {q:"You realise you entered your password on a fake page. What should you do first?",
+   o:["Wait and see if anything happens","Delete the email and forget it","Change the password (and anywhere it's reused) and report it to IT","Post about it on social media"],a:2,
+   e:"Speed matters. Change credentials immediately and tell your security team."},
+  {q:"A USB stick labelled \"Salaries 2026\" is found in the office car park. You should:",
+   o:["Plug it in to find the owner","Hand it to IT/security without plugging it in","Take it home to check","Plug it into a colleague's computer instead"],a:1,
+   e:"This is baiting. Dropped USB drives are a known way to deliver malware."}
+];
+let qi=0, score=0;
+const box=document.getElementById('quizBox');
+function renderQ(){
+  if(qi>=quiz.length) return renderResult();
+  const q=quiz[qi];
+  box.innerHTML=`<div class="qnum">Question ${qi+1} of ${quiz.length}</div><h3>${q.q}</h3>
+   <div class="opts">${q.o.map((o,i)=>`<button data-i="${i}">${o}</button>`).join('')}</div>
+   <div class="feedback" aria-live="polite"></div>`;
+  box.querySelectorAll('.opts button').forEach(b=>b.addEventListener('click',()=>{
+    const pick=+b.dataset.i, btns=box.querySelectorAll('.opts button');
+    btns.forEach(x=>x.disabled=true);
+    btns[q.a].classList.add('correct');
+    if(pick===q.a) score++; else b.classList.add('incorrect');
+    box.querySelector('.feedback').innerHTML=`<strong>${pick===q.a?'Correct.':'Not quite.'}</strong> ${q.e}`;
+    const next=document.createElement('button'); next.className='primary';
+    next.textContent= qi===quiz.length-1 ? 'See my result' : 'Next question';
+    next.addEventListener('click',()=>{qi++;renderQ();}); box.appendChild(next); next.focus();
+  }));
+}
+function renderResult(){
+  const pass=score>=8;
+  box.innerHTML=`<div class="result"><div class="score">${score}/${quiz.length}</div>
+   <h3>${pass?'You passed. You are hard to phish.':'Not quite there yet.'}</h3>
+   <p>${pass?'Keep verifying before you click, and report anything suspicious.':'Review steps 2 to 6, then try again. Every attempt makes the patterns easier to spot.'}</p>
+   <button class="primary" id="retry">Retake quiz</button></div>`;
+  document.getElementById('retry').addEventListener('click',()=>{qi=0;score=0;renderQ();});
+}
+renderQ();
+
+/* highlight current section in nav */
+const links=[...document.querySelectorAll('.progress a')];
+const obs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+e.target.id));}
+}),{rootMargin:'-40% 0px -55% 0px'});
+document.querySelectorAll('main section').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
