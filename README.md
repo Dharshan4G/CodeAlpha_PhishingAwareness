@@ -1,4 +1,4 @@
-# CodeAlpha — Task 2: Phishing Awareness Training
+#  Phishing Awareness Training
 
 An interactive, self-paced online training module that teaches people to recognise and avoid phishing attacks.
 
